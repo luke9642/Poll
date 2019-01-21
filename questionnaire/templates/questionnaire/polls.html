@@ -1,0 +1,95 @@
+{% extends 'questionnaire/base.html' %}
+{% load static %}
+
+{% block head %}
+    <script src="{% static 'questionnaire/JSONDataRegistry.js' %}"></script>
+
+    <script>
+        $(document).ready(function () {
+            const numberOfPolls = $("#number-of-polls");
+
+            $(".remove-poll").on("click", function (event) {
+                event.preventDefault();
+                JSONDataRegistry.removePoll($(this).closest(".poll")[0]);
+
+                numberOfPolls.text(Number(numberOfPolls.text()) - 1);
+            });
+
+            $(".copy-text").on({
+                click: function (event) {
+                    event.preventDefault();
+
+                    let succeed = true;
+                    const selector = $("<textarea class='w-0 h-0 p-0 m-0' style='opacity: 0'>" + window.location.origin + $(this).closest(".poll").attr("href") + "</textarea>");
+                    selector.appendTo(document.body).select();
+
+                    try {
+                        succeed = document.execCommand("copy");
+                    } catch (e) {
+                        succeed = false;
+                    }
+
+                    selector.remove();
+
+                    if (succeed)
+                        $(this).attr("data-original-title", "Coppied!").tooltip("show");
+
+
+                },
+                mouseleave: function () {
+                    $(this).attr("data-original-title", "Click to copy Questionnaire's URL").tooltip("hide");
+                }
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <h3>
+                Questionnaires
+                <span id="number-of-polls" class="badge badge-pill badge-primary">{{ polls|length }}</span>
+            </h3>
+            <h3 class="text-muted">{{ user }}</h3>
+        </div>
+        <div class="list-group list-group-flush">
+            {% for poll in polls %}
+                <a id="{{ poll.hash }}"
+                   class="poll d-flex justify-content-between list-group-item list-group-item-action"
+                   href="{% url 'poll_view' poll.hash %}">
+                    <div>
+                        <span class="h4 mb-0 mr-1">{{ poll.name|title }}</span>
+                        <sup class="badge badge-secondary">{{ poll.number_of_questions }}
+                            question{{ poll.number_of_questions|pluralize }}</sup>
+                    </div>
+                    <div>
+                        <span class="text-muted">{{ poll.pub_date }}</span>
+
+                        <div class="btn-group ml-3">
+                            <button class="btn btn-info"
+                                    onclick="document.location.href = '{% url "answers" poll.hash %}'; return false">
+                                Answers <span class="badge badge-light">{{ poll.answers.all|length }}</span>
+                            </button>
+                            <button class="copy-text btn btn-info" data-toggle="tooltip"
+                                    data-html="true" data-original-title="Click to copy Questionnaire's URL">
+                                Copy URL
+                            </button>
+                            <button class="remove-poll btn btn-danger">
+                                <i class='fas fa-trash-alt'></i>
+                            </button>
+                        </div>
+                    </div>
+                </a>
+            {% empty %}
+                <div class="list-group-item">
+                    <p>No questionnaires...</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <button id="add-poll" class="btn btn-info btn-lg rounded-circle position-fixed p-0 w-40 h-40">
+        <a class="text-white d-block" href="{% url 'poll_create' %}"><i class="fas fa-plus"></i></a>
+    </button>
+
+{% endblock %}

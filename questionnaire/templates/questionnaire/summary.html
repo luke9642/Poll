@@ -1,0 +1,59 @@
+{% extends 'questionnaire/base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block head %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.bundle.js"></script>
+
+    <script src="{% static 'questionnaire/charts.js' %}"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            const questions = JSON.parse('{{ questions | to_json | escapejs }}');
+
+            const chartQuestions = questions.questions
+                .filter(question => ["Linear Scale", "Single Choice"].includes(question.type))
+                .filter(question => !$.isEmptyObject(question.answers));
+            console.log(chartQuestions);
+            $.each(chartQuestions, (index, question) => createChart($("#question-" + question.id), question));
+        })
+    </script>
+{% endblock %}
+
+{% block content %}
+
+
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h1>{{ poll.name }}</h1>
+            <div class="btn-group">
+                <a class="btn btn-secondary" href="{% url 'answers' poll.hash %}">Answers</a>
+                <a class="btn btn-secondary active" href="{% url 'summary' poll.hash %}">Summary</a>
+            </div>
+        </div>
+        <ul class="list-group list-group-flush">
+            {% for question in questions.questions %}
+                <li class="list-group-item">
+                    <h3 class="card-title">{{ question.question }}</h3>
+                    <h6 class="card-subtitle mb-2 text-muted">{{ question.answers|length }}
+                        answer{{ question.answers|pluralize }}</h6>
+                    {% if question.answers %}
+                        {% if question.type == "Linear Scale" or question.type == "Single Choice" %}
+                            <div class="m-5">
+                                <canvas id="question-{{ question.id }}"></canvas>
+                            </div>
+                        {% else %}
+                            <ul class="list-group m-5">
+                                {% for answer in question.answers %}
+                                    <li class="list-group-item {% cycle 'list-group-item-secondary' 'list-group-item-light' %}">
+                                        {{ answer }}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}

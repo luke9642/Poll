@@ -1,0 +1,52 @@
+{% extends 'questionnaire/base.html' %}
+{% load static %}
+
+{% block head %}
+    <script src="{% static 'questionnaire/JSONDataRegistry.js' %}"></script>
+    <script src="{% static 'questionnaire/choice.js' %}"></script>
+    <script src="{% static 'questionnaire/choicesMapper.js' %}"></script>
+    <script src="{% static 'questionnaire/question.js' %}"></script>
+    <script src="{% static 'questionnaire/poll.js' %}"></script>
+
+    <script>
+        $(document).ready(function () {
+            const fields = {
+                ".header": ["name", "value"],
+                ".required": ["required", "checked"],
+                ".type": ["type", "value"],
+                ".choice": ["choices", "value"]
+            };
+
+            const poll = new Poll();
+
+            poll.addQuestion();
+
+            $.each(fields, (key, value) => {
+                poll.form.on("change", key, event => {
+                    poll.questions[poll.getQuestionIndex($(event.target).closest(".question")[0].id)][value[0]] = event.target[value[1]];
+                });
+            });
+
+            poll.addEvents();
+        })
+    </script>
+{% endblock %}
+
+
+{% block content %}
+    <form id="poll" method="post">{% csrf_token %}
+        <div class="card">
+            <div class="card-header">
+                <input id="poll-title" class="h3 form-control form-control-lg form-control-plaintext" type="text"
+                       value="New questionnaire" required/>
+            </div>
+            <ul class="list-group list-group-flush"></ul>
+            <div class="card-footer d-flex justify-content-end">
+                <button class="btn btn-primary" type="submit">Save poll</button>
+            </div>
+        </div>
+    </form>
+    <button id="add-question" class="btn btn-info btn-lg rounded-circle position-fixed p-0 w-40 h-40">
+        <i class="fas fa-plus"></i>
+    </button>
+{% endblock %}

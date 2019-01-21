@@ -1,0 +1,56 @@
+{% extends 'questionnaire/base.html' %}
+{% block content %}
+    <form method="post" action="{% url 'register' %}">{% csrf_token %}
+        <div class="card border-info">
+            <h3 class="card-header">
+                Register
+            </h3>
+            <div class="card-body text-center">
+                <h5 class="card-title"></h5>
+                <p class="card-text">Welcome to questionnaire service!</p>
+                <div class="form-group w-50 mx-auto">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="{{ form.username.id_for_label }}">Username:</label>
+                        </div>
+                        <input class="form-control" type="text" name="{{ form.username.html_name }}" autofocus required
+                               id="{{ form.username.id_for_label }}">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text"
+                                   for="{{ form.password1.id_for_label }}">Password:&nbsp;</label>
+                        </div>
+                        <input class="form-control" type="password" name="{{ form.password1.html_name }}" required
+                               id="{{ form.password1.id_for_label }}">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text"
+                                   for="{{ form.password2.id_for_label }}">Password:&nbsp;</label>
+                        </div>
+                        <input class="form-control" type="password" name="{{ form.password2.html_name }}" required
+                               id="{{ form.password2.id_for_label }}">
+                    </div>
+                </div>
+
+                {% if form.non_field_errors or form.username.errors or form.password1.errors or form.password2.errors %}
+                    <div class="text-left alert alert-danger alert-dismissible fade show" role="alert">
+                        {{ form.non_field_errors }}
+                        {{ form.username.errors }}
+                        {{ form.password1.errors }}
+                        {{ form.password2.errors }}
+                        <button type="button" class="close" data-dismiss="alert">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="card-footer d-flex justify-content-end">
+                <button class="btn btn-primary" type="submit">Register</button>
+            </div>
+        </div>
+    </form>
+
+
+{% endblock %}

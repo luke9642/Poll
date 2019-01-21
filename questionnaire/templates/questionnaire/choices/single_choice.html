@@ -1,0 +1,10 @@
+{% for option in question.choice.options.all %}
+    {% with option=option.text %}
+        <div class="custom-control custom-radio">
+            <input class="custom-control-input" type="radio" name="{{ question.question_text }}"
+                   id="{{ question.question_text }}-{{ option }}" value="{{ option }}" {% if question.required %}required{% endif %}>
+            <label class="custom-control-label" for="{{ question.question_text }}-{{ option }}">{{ option }}</label>
+        </div>
+    {% endwith %}
+{% endfor %}
+

@@ -1,0 +1,9 @@
+<div class="d-flex justify-content-around">
+    {% for choice in question.choice.range %}
+        <div class="custom-control custom-radio">
+            <input class="custom-control-input" type="radio" name="{{ question.question_text }}"
+                   id="{{ question.question_text }}-{{ choice }}" value="{{ choice }}" {% if question.required %}required{% endif %}>
+            <label class="custom-control-label" for="{{ question.question_text }}-{{ choice }}">{{ choice }}</label>
+        </div>
+    {% endfor %}
+</div>
